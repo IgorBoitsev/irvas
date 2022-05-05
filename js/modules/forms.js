@@ -1,8 +1,11 @@
-export const forms = () => {
+import { checkNumInputs } from "./checkNumInputs.js";
+
+export const forms = (state) => {
 
   const forms = document.querySelectorAll('form'),
-        inputs = document.querySelectorAll('input'),
-        phoneInputs = document.querySelectorAll('input[name="user_phone"]')
+        inputs = document.querySelectorAll('input');
+
+  checkNumInputs('input[name="user_phone"]');
 
   const message = {
     loading: 'Звгрузка...',
@@ -10,14 +13,11 @@ export const forms = () => {
     failure: 'Что-то пошло не так...'
   };
 
-  const postData = async (url, form) => {
+  const postData = async (url, formData) => {
     document.querySelector('.status').textContent = message.loading;
     return await fetch(url, {
       method: 'POST',
-      body: JSON.stringify({
-        user_name: form.querySelector('[name="user_name"]'),
-        user_phone: form.querySelector('[name="user_phone"]')
-      })
+      body: JSON.stringify(formData)
     });
 
   };
@@ -28,12 +28,6 @@ export const forms = () => {
     })
   };
 
-  phoneInputs.forEach(phoneInput => {
-    phoneInput.addEventListener('input', () => {
-      phoneInput.value = phoneInput.value.replace(/\D/, '');
-    })
-  })
-
   forms.forEach(form => {
     form.addEventListener('submit', event => {
       event.preventDefault();
@@ -42,19 +36,33 @@ export const forms = () => {
       statusMessage.classList.add('status');
       form.appendChild(statusMessage);
 
-      // const formData = new FormData(item);
+      const formData = {
+        user_name: form.querySelector('[name="user_name"]').value,
+        user_phone: form.querySelector('[name="user_phone"]').value
+      };
 
-      postData('https://jsonplaceholder.typicode.com/posts', form)
+      if (form.getAttribute('data-calc') === 'end') {
+        for (let key in state) {
+          formData[key] = state[key];
+        }
+      }
+
+      console.log(formData);
+
+      postData('https://jsonplaceholder.typicode.com/posts', formData)
         .then(response => {
-          console.log(response.ok);
-          console.log(response.status);
+          console.log('OK: ' + response.ok + ', STATUS: ' + response.status);
           statusMessage.textContent = message.success;
         })
-        .catch(error => statusMessage.textContent = message.failure)
+        .catch(error => {
+          statusMessage.textContent = message.failure;
+          console.error(error);
+        })
         .finally(() => {
           clearInputs();
           setTimeout(() => {
             statusMessage.remove();
+            document.querySelector('.popup_calc_end').style.display = 'none';
           }, 3000);
         })
     })
