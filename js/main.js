@@ -7,9 +7,10 @@ import { forms } from "./modules/forms.js";
 import { changeModalState } from "./modules/changeModalState.js";
 import { checkNumInputs } from "./modules/checkNumInputs.js";
 import { timer } from "./modules/timer.js";
+import { images } from "./modules/images.js";
+
 
 let modalState = {};
-let deadLine = '2022-05-07';
 
 modals();
 tabs('.glazing_slider', '.glazing_block', '.glazing_content', 'active');
@@ -18,4 +19,5 @@ tabs('.balcon_icons', '.balcon_icons_img', '.big_img > img', 'do_image_more', 'i
 checkNumInputs();
 changeModalState(modalState);
 forms(modalState);
-timer('.container1', deadLine);
+timer('.container1', '2022-05-07');
+images();
